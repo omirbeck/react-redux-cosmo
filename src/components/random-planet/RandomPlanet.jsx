@@ -1,55 +1,62 @@
-import React from 'react';
+import React, { useState } from "react";
 
-import SwapiService from '../../services/swapi-service';
+import SwapiService from "../../services/swapi-service";
+import ErrorIndicator from "../error-indicator/ErrorIndicator";
 
-import './RandomPlanet.css';
+import Spinner from "../spinner/Spinner";
+import PlanetView from "./PlanetView";
+
+
+import "./RandomPlanet.css";
 
 const RandomPlanet = () => {
-
-  const [state, setState] = React.useState({});
+  const [state, setState] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   React.useEffect(() => {
     const swapiService = new SwapiService();
-    const idPlanet = Math.floor(Math.random() * 25) + 2;
 
     const onPlanetLoaded = (planet) => {
       setState(planet);
+      setLoading(false);
+    };
+
+    const onError = () => {
+      setLoading(false);
+      setError(true);
     }
 
     const updatePlanet = (id) => {
       swapiService.getPlanet(id)
         .then(onPlanetLoaded)
-      }
+        .catch(onError);
+    };
 
+    const interval = setInterval(() => {
+      const idPlanet = Math.floor(Math.random() * 25) + 2;
       updatePlanet(idPlanet);
-  }, [])
+    }, 5000)
 
-    const {id, name, population, rotationPeriod, diameter} = state;
+    return () => {
+      clearInterval(interval);
+    }
 
-    return (
-      <div className="random-planet jumbotron rounded">
-        <img className="planet-image"
-             src={`https://starwars-visualguide.com/assets/img/planets/${id}.jpg`} />
-        <div>
-          <h4>{name}</h4>
-          <ul className="list-group list-group-flush">
-            <li className="list-group-item">
-              <span className="term">Population</span>
-              <span>{population}</span>
-            </li>
-            <li className="list-group-item">
-              <span className="term">Rotation Period</span>
-              <span>{rotationPeriod}</span>
-            </li>
-            <li className="list-group-item">
-              <span className="term">Diameter</span>
-              <span>{diameter}</span>
-            </li>
-          </ul>
-        </div>
-      </div>
+  }, []);
 
-    );
-}
+  const hasData = !(loading || error)
+
+  const spinner = loading ? <Spinner /> : null;
+  const content = hasData ? <PlanetView planet={state} /> : null;
+  const errorMessage = error ? <ErrorIndicator /> : null;
+
+  return (
+    <div className="random-planet jumbotron rounded">
+      {spinner}
+      {content}
+      {errorMessage}
+    </div>
+  );
+};
 
 export default RandomPlanet;
