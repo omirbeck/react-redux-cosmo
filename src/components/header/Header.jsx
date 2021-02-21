@@ -1,25 +1,37 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 
 import './Header.css';
 
-const Header = () => {
+const Header = ({ onServiceChange }) => {
+  // const history = useHistory();
+  // const location = useLocation();
+  // const params = useParams("555");
+  // const math = useRouteMatch("/starships");
+
+
   return (
     <div className="header d-flex">
       <h3>
-        <a href="1">
+        <NavLink exact to="/">
           Star DB
-        </a>
+        </NavLink>
       </h3>
       <ul className="d-flex">
         <li>
-          <a href="2">People</a>
+          <NavLink to="/people">People</NavLink>
         </li>
         <li>
-          <a href="3">Planets</a>
+          <NavLink to="/planets">Planets</NavLink>
         </li>
         <li>
-          <a href="4">Starships</a>
+          <NavLink to="./starships">Starships</NavLink>
         </li>
+        <button
+          onClick={onServiceChange}
+          className="btn btn-primary btn-sm">
+        Change Service
+      </button>
       </ul>
     </div>
   );
