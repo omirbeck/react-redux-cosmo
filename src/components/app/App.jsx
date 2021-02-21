@@ -1,25 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
+import SwapiService from "../../services/swapi-service";
 import Header from "../header/Header";
-import ItemList from "../item-list/ItemList";
-import PersonDetails from "../person-details/PersonDetails";
 import RandomPlanet from "../random-planet/RandomPlanet";
+import { SwapiServiceProvider } from "../swapi-service-context/swapi-service-context";
+import DummySwapiService from "../../services/dummy-swapi-service";
 
 import "./App.css";
 
-const App = () => {
+const App = ({ children }) => {
+  const [swapiService, setSwapiService] = useState(new SwapiService())
+
+  const onServiceChange = () => {
+    const Service = swapiService instanceof SwapiService ? DummySwapiService : SwapiService;
+    setSwapiService(new Service());
+  }
+
   return (
-    <div>
-      <Header />
-      <RandomPlanet />
-      <div className="row mb2">
-        <div className="col-md-6">
-          <ItemList />
-        </div>
-        <div className="col-md-6">
-          <PersonDetails />
-        </div>
+    <SwapiServiceProvider value={swapiService}>
+      <div className="app-wrapper">
+        <Header onServiceChange={onServiceChange} />
+        <RandomPlanet />
+        {children}
       </div>
-    </div>
+    </SwapiServiceProvider>
   );
 };
 
